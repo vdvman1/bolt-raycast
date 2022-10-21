@@ -37,7 +37,7 @@ python-semantic-release = "^7.31.4"
 addopts = "tests --import-mode=importlib"
 
 [tool.pyright]
-typeCheckingMode = "strict"
+typeCheckingMode = "basic"
 
 [tool.black]
 target-version = ["py310"]
