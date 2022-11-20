@@ -1,6 +1,9 @@
 from contextlib import contextmanager
 from math import ceil
+from bolt import Runtime
 from bolt_raycast:if_new_block_pos import IfNewBlockPos
+
+runtime = ctx.inject(Runtime)
 
 class RayStep:
     def __init__(self, ray, first, new_block_pos_tag):
@@ -40,7 +43,6 @@ class Ray:
         self._steps = steps
     
     def __iter__(self):
-        first_name = f"{self._parent}/first_step"
         name = f"{self._parent}/step"
 
         def check_recurse(checking_pos):
@@ -60,31 +62,34 @@ class Ray:
                 recurse()
         
         step = RayStep(self, True, None)
-        function first_name:
+
+        with runtime.scope() as cmds:
             yield step
             scoreboard players add #distance self._objective 1
             check_recurse(False)
 
         block_pos_tag = step.new_block_pos_tag
-        step = RayStep(self, False, block_pos_tag)
-        function name:
-            yield step
-            scoreboard players add #distance self._objective 1
-            check_recurse(block_pos_tag is not None)
-        
-        if block_pos_tag is None:
-            function first_name
-        else:
+        if block_pos_tag:
+            step = RayStep(self, False, block_pos_tag)
+            function name:
+                yield step
+                scoreboard players add #distance self._objective 1
+                check_recurse(True)
+            
             summon minecraft:marker ~ ~ ~ {Tags:[block_pos_tag]}
             o = 0.001 # offset so that dx can find the marker correctly
             execute
                 positioned ~-o ~-o ~-o
                 as @e[type=minecraft:marker,tag=block_pos_tag,dx=0,limit=1]
-                positioned ~o ~o ~o:
-                    execute function f"{self._parent}/init_ray":
-                        align xyz tp @s ~0.5 ~0.5 ~0.5
-                        function first_name
-                        kill @s
+                positioned ~o ~o ~o
+                function f"{self._parent}/init_ray":
+                    align xyz tp @s ~0.5 ~0.5 ~0.5
+                    execute function f"{self._parent}/first_step":
+                        runtime.commands.extend(cmds)
+                    kill @s
+        else:
+            execute function name:
+                runtime.commands.extend(cmds)
 
     def stop(self):
         self._stop_requested = True
