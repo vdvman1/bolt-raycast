@@ -11,3 +11,14 @@ with raycast(blocks = 10, parent = __name__) as ray:
     for step in ray:
         say next step
     say ray finished
+
+as @a at @s anchored eyes positioned ^ ^ ^:
+    with raycast(blocks = 10, parent = __name__) as ray:
+        say start ray
+        for step in ray:
+            say next step
+            if step.is_new_block_pos():
+                say new block pos!
+            else:
+                say oh, same block pos
+        say ray finished

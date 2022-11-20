@@ -1,16 +1,37 @@
 from contextlib import contextmanager
 from math import ceil
+from bolt_raycast:if_new_block_pos import IfNewBlockPos
 
 class RayStep:
-    potentially_hit = False
+    def __init__(self, ray, first, new_block_pos_tag):
+        self._ray = ray
+        self._first = first
+        self._new_block_pos_tag = new_block_pos_tag
 
-    def __init__(self, parent, tag, objective, step_size):
-        self._parent = parent
-        self._tag = tag
-        self._objective = objective
-        self._step_size = step_size
+    @property
+    def ray(self):
+        return self._ray
+
+    @property
+    def new_block_pos_tag(self):
+        return self._new_block_pos_tag
+
+    # TODO: Support providing an existing selector for the helper entity
+    def is_new_block_pos(self, tag="bolt_raycast.block_pos"):
+        if self._first:
+            if self._new_block_pos_tag is None:
+                self._new_block_pos_tag = tag
+            
+            return True
+        
+        if tag != self._new_block_pos_tag:
+            raise ValueError("tag must not change inside a single loop")
+        
+        return IfNewBlockPos(self._ray.objective)
 
 class Ray:
+    _stop_requested = False
+
     def __init__(self, parent, tag, objective, step_size, steps):
         self._parent = parent
         self._tag = tag
@@ -19,23 +40,74 @@ class Ray:
         self._steps = steps
     
     def __iter__(self):
+        first_name = f"{self._parent}/first_step"
         name = f"{self._parent}/step"
-        step = RayStep(self._parent, self._tag, self._objective, self._step_size)
-        execute function name:
-            yield step
-            scoreboard players add #distance self._objective 1
 
+        def check_recurse(checking_pos):
             def recurse():
-                execute
-                    if score #distance self._objective matches (None, self._steps)
-                    positioned ^ ^ ^self._step_size
-                    function name
-
-            if step.potentially_hit:
+                if score #distance self._objective matches (None, self._steps):
+                    if checking_pos:
+                        execute function f"{self._parent}/move_pos":
+                            align xyz tp @s ~0.5 ~0.5 ~0.5
+                            positioned ^ ^ ^self._step_size function name
+                    else:
+                        positioned ^ ^ ^self._step_size function name
+            
+            if self._stop_requested:
                 if score #hit self._objective matches 0:
                     recurse()
             else:
                 recurse()
+        
+        step = RayStep(self, True, None)
+        function first_name:
+            yield step
+            scoreboard players add #distance self._objective 1
+            check_recurse(False)
+
+        block_pos_tag = step.new_block_pos_tag
+        step = RayStep(self, False, block_pos_tag)
+        function name:
+            yield step
+            scoreboard players add #distance self._objective 1
+            check_recurse(block_pos_tag is not None)
+        
+        if block_pos_tag is None:
+            function first_name
+        else:
+            summon minecraft:marker ~ ~ ~ {Tags:[block_pos_tag]}
+            o = 0.001 # offset so that dx can find the marker correctly
+            execute
+                positioned ~-o ~-o ~-o
+                as @e[type=minecraft:marker,tag=block_pos_tag,dx=0,limit=1]
+                positioned ~o ~o ~o:
+                    execute function f"{self._parent}/init_ray":
+                        align xyz tp @s ~0.5 ~0.5 ~0.5
+                        function first_name
+                        kill @s
+
+    def stop(self):
+        self._stop_requested = True
+        scoreboard players set #hit self._objective 1
+    
+    def sub_path(self, path):
+        return f"{self._parent}/{path}"
+
+    @property
+    def initiator_tag(self):
+        return self._tag
+
+    @property
+    def objective(self):
+        return self._objective
+
+    @property
+    def step_size(self):
+        return self._step_size
+    
+    @property
+    def max_steps(self):
+        return self._steps
 
 used_objectives = set()
 load_func = generate_path()
@@ -51,6 +123,8 @@ def create_objective(objective):
         
         append function load_func:
             scoreboard objectives add objective dummy
+
+# TODO: Support using a score for blocks/steps
 
 @contextmanager
 def raycast(*,
@@ -72,7 +146,7 @@ def raycast(*,
         if steps is None:
             steps = ceil(blocks / step_size)
         else:
-            raise ValueError("Cannot specified both a block distance and a step count")
+            raise ValueError("Cannot specify both a block distance and a step count")
 
     name_spec = "raycast_{incr}"
     if parent is None or len(parent) == 0:
@@ -84,13 +158,14 @@ def raycast(*,
         with ctx.override(generate_path = parent) as no_prefix:
             parent = no_prefix.generate.path(name_spec)
 
-    if tag is not None:
-        tag @s add tag
-    
-    scoreboard players set #hit objective 0
-    scoreboard players set #distance objective 0
-    
-    yield Ray(parent, tag, objective, step_size, steps)
+    execute function f"{parent}/run_ray":
+        if tag is not None:
+            tag @s add tag
+        
+        scoreboard players set #hit objective 0
+        scoreboard players set #distance objective 0
 
-    if tag is not None:
-        tag @s remove tag
+        yield Ray(parent, tag, objective, step_size, steps)
+
+        if tag is not None:
+            tag @s remove tag

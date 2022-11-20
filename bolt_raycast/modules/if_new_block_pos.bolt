@@ -1,0 +1,26 @@
+from contextlib import contextmanager
+
+class IfNewBlockPos:
+    def __init__(self, objective, inverted = False, search = True):
+        self._objective = objective
+        self._inverted = inverted
+        self._search = search
+    
+    def __not__(self):
+        return IfNewBlockPos(self._objective, not self._inverted, self._search)
+    
+    @contextmanager
+    def __branch__(self):
+        if self._search:
+            self._search = False
+            execute
+                align xyz 
+                store result score #same_block self._objective
+                if entity @s[dx=0]
+
+        if self._inverted:
+            unless score #same_block self._objective matches 0:
+                yield True
+        else:
+            if score #same_block self._objective matches 0:
+                yield True
