@@ -14,7 +14,7 @@ tests-no-zope = ["cloudpickle", "coverage[toml] (>=5.0.2)", "hypothesis", "mypy 
 
 [[package]]
 name = "beet"
-version = "0.79.2"
+version = "0.80.0"
 description = "The Minecraft pack development kit"
 category = "main"
 optional = false
@@ -847,7 +847,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "ec07fcd990fbe8b99017153e9c3b46d1ac88e5b7a92a0d47739a5d8fc8e713ac"
+content-hash = "df327d1b83f73c6d2208c1fe2624d325709a8f496c6ea9380fe7b750081290e9"
 
 [metadata.files]
 attrs = [
@@ -855,8 +855,8 @@ attrs = [
     {file = "attrs-22.1.0.tar.gz", hash = "sha256:29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6"},
 ]
 beet = [
-    {file = "beet-0.79.2-py3-none-any.whl", hash = "sha256:f02e1d14cda88d5c25e84df483aba169a60687e63d1365ff5e0c65a9cfb656da"},
-    {file = "beet-0.79.2.tar.gz", hash = "sha256:ed683d68411b27e639ffd762d5c6a06cd09a040f1e441d6f6f6337b94cec6442"},
+    {file = "beet-0.80.0-py3-none-any.whl", hash = "sha256:5be5db00303f31ed501de0c7959e40b73b319f790e0f3514b0b0bc7439bd4877"},
+    {file = "beet-0.80.0.tar.gz", hash = "sha256:4d8aa4fedf28171bd2f55f1d837b73821a2d68aa7a5acada3ea426b37e36054e"},
 ]
 black = [
     {file = "black-22.8.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:ce957f1d6b78a8a231b18e0dd2d94a33d2ba738cd88a7fe64f53f659eea49fdd"},
