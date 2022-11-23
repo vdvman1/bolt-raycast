@@ -23,6 +23,12 @@ function demo:foo/raycast_1/run_ray
 execute as @a at @s anchored eyes positioned ^ ^ ^ run function demo:foo/raycast_2/run_ray
 function demo:foo/raycast_3/run_ray
 function demo:foo/raycast_4/run_ray
+function demo:foo/raycast_5/run_ray
+function demo:foo/raycast_6/run_ray
+function demo:foo/raycast_7/run_ray
+function demo:foo/raycast_8/run_ray
+function demo:foo/raycast_9/run_ray
+function demo:foo/raycast_10/run_ray
 ```
 
 `@function demo:foo/raycast_0/step`
@@ -225,6 +231,207 @@ scoreboard players set #distance bolt_raycast.temp 0
 scoreboard players set #hit bolt_raycast.temp 0
 summon minecraft:marker ~ ~ ~ {Tags: ["bolt_raycast.block_pos"]}
 execute positioned ~-0.001 ~-0.001 ~-0.001 as @e[type=minecraft:marker, tag=bolt_raycast.block_pos, dx=0, limit=1] positioned ~0.001 ~0.001 ~0.001 run function demo:foo/raycast_4/init_ray
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:foo/raycast_5/step`
+
+```mcfunction
+say next step
+execute if block ~ ~ ~ minecraft:stone run say hit stone!
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:foo/raycast_5/step
+```
+
+`@function demo:foo/raycast_5/run_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+function demo:foo/raycast_5/step
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:foo/raycast_6/hit_block`
+
+```mcfunction
+say hit stone!
+scoreboard players set #hit bolt_raycast.temp 1
+```
+
+`@function demo:foo/raycast_6/step`
+
+```mcfunction
+say next step
+execute if block ~ ~ ~ minecraft:stone run function demo:foo/raycast_6/hit_block
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #hit bolt_raycast.temp matches 0 if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:foo/raycast_6/step
+```
+
+`@function demo:foo/raycast_6/run_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+scoreboard players set #hit bolt_raycast.temp 0
+function demo:foo/raycast_6/step
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:foo/raycast_7/step`
+
+```mcfunction
+say next step
+execute store result score #has_block bolt_raycast.temp if block ~ ~ ~ minecraft:stone
+execute unless score #has_block bolt_raycast.temp matches 0 run say hit stone!
+execute if score #has_block bolt_raycast.temp matches 0 run say no stone yet
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:foo/raycast_7/step
+```
+
+`@function demo:foo/raycast_7/run_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+function demo:foo/raycast_7/step
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:foo/raycast_8/hit_block`
+
+```mcfunction
+say hit stone!
+scoreboard players set #hit bolt_raycast.temp 1
+```
+
+`@function demo:foo/raycast_8/step`
+
+```mcfunction
+say next step
+execute store result score #has_block bolt_raycast.temp if block ~ ~ ~ minecraft:stone
+execute unless score #has_block bolt_raycast.temp matches 0 run function demo:foo/raycast_8/hit_block
+execute if score #has_block bolt_raycast.temp matches 0 run say no stone yet
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #hit bolt_raycast.temp matches 0 if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:foo/raycast_8/step
+```
+
+`@function demo:foo/raycast_8/run_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+scoreboard players set #hit bolt_raycast.temp 0
+function demo:foo/raycast_8/step
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:foo/raycast_9/hit_block`
+
+```mcfunction
+say hit stone!
+scoreboard players set #hit bolt_raycast.temp 1
+```
+
+`@function demo:foo/raycast_9/not_hit_block`
+
+```mcfunction
+say oh
+say no stone yet
+```
+
+`@function demo:foo/raycast_9/step`
+
+```mcfunction
+say next step
+execute store result score #has_block bolt_raycast.temp if block ~ ~ ~ minecraft:stone
+execute unless score #has_block bolt_raycast.temp matches 0 run function demo:foo/raycast_9/hit_block
+execute if score #has_block bolt_raycast.temp matches 0 run function demo:foo/raycast_9/not_hit_block
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #hit bolt_raycast.temp matches 0 if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:foo/raycast_9/step
+```
+
+`@function demo:foo/raycast_9/run_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+scoreboard players set #hit bolt_raycast.temp 0
+function demo:foo/raycast_9/step
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:foo/raycast_10/hit_block`
+
+```mcfunction
+say hit stone!
+scoreboard players set #hit bolt_raycast.temp 1
+```
+
+`@function demo:foo/raycast_10/new_block_pos`
+
+```mcfunction
+execute store result score #has_block bolt_raycast.temp if block ~ ~ ~ minecraft:stone
+execute unless score #has_block bolt_raycast.temp matches 0 run function demo:foo/raycast_10/hit_block
+execute if score #has_block bolt_raycast.temp matches 0 run say no stone yet
+```
+
+`@function demo:foo/raycast_10/move_pos`
+
+```mcfunction
+execute align xyz run tp @s ~0.5 ~0.5 ~0.5
+execute positioned ^ ^ ^0.1 run function demo:foo/raycast_10/step
+```
+
+`@function demo:foo/raycast_10/first_step`
+
+```mcfunction
+say next step
+execute store result score #has_block bolt_raycast.temp if block ~ ~ ~ minecraft:stone
+execute unless score #has_block bolt_raycast.temp matches 0 run function demo:foo/raycast_10/hit_block
+execute if score #has_block bolt_raycast.temp matches 0 run say no stone yet
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #hit bolt_raycast.temp matches 0 if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:foo/raycast_10/step
+```
+
+`@function demo:foo/raycast_10/init_ray`
+
+```mcfunction
+execute align xyz run tp @s ~0.5 ~0.5 ~0.5
+function demo:foo/raycast_10/first_step
+kill @s
+```
+
+`@function demo:foo/raycast_10/step`
+
+```mcfunction
+say next step
+execute align xyz store result score #same_block bolt_raycast.temp if entity @s[dx=0]
+execute if score #same_block bolt_raycast.temp matches 0 run function demo:foo/raycast_10/new_block_pos
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #hit bolt_raycast.temp matches 0 if score #distance bolt_raycast.temp matches ..100 run function demo:foo/raycast_10/move_pos
+```
+
+`@function demo:foo/raycast_10/run_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+scoreboard players set #hit bolt_raycast.temp 0
+summon minecraft:marker ~ ~ ~ {Tags: ["bolt_raycast.block_pos"]}
+execute positioned ~-0.001 ~-0.001 ~-0.001 as @e[type=minecraft:marker, tag=bolt_raycast.block_pos, dx=0, limit=1] positioned ~0.001 ~0.001 ~0.001 run function demo:foo/raycast_10/init_ray
 tag @s remove bolt_raycast.source
 say ray finished
 ```

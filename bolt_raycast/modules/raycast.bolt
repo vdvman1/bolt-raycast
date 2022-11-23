@@ -3,6 +3,7 @@ from math import ceil
 from bolt import Runtime
 from bolt.contrib.defer import Defer
 from bolt_raycast:if_new_block_pos import IfNewBlockPos
+from bolt_raycast:detect_block import DetectBlock
 
 runtime = ctx.inject(Runtime)
 defer = ctx.inject(Defer)
@@ -33,6 +34,23 @@ class RayStep:
             raise ValueError("tag must not change inside a single loop")
         
         return IfNewBlockPos(self._ray)
+
+    # check if the current block matches
+    def detect_block(
+        self,
+        # TODO: support arbitrary block predicate
+        id, # : str | list[str] # Single block ID, single block tag, or list of block IDs / block tags
+        ):
+
+        if isinstance(id, list):
+            ids = id
+            id = f"{self._parent}/blocks"
+            block_tag id {
+                "values": ids
+            }
+            id = "#" + id
+
+        return DetectBlock(self._ray, id)
 
 class Ray:
     _stop_requested = False
