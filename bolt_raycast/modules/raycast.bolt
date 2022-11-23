@@ -32,7 +32,7 @@ class RayStep:
         if tag != self._new_block_pos_tag:
             raise ValueError("tag must not change inside a single loop")
         
-        return IfNewBlockPos(self._ray.objective)
+        return IfNewBlockPos(self._ray)
 
 class Ray:
     _stop_requested = False
@@ -129,6 +129,13 @@ class Ray:
     @property
     def max_steps(self):
         return self._steps
+
+    def emit_block(self, block_name, cmds):
+        if len(cmds) == 1:
+            runtime.commands.extend(cmds)
+        else:
+            execute function self.sub_path(block_name):
+                runtime.commands.extend(cmds)
 
 used_objectives = set()
 load_func = generate_path()

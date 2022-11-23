@@ -1,13 +1,16 @@
 from contextlib import contextmanager
+from bolt import Runtime
+
+runtime = ctx.inject(Runtime)
 
 class IfNewBlockPos:
-    def __init__(self, objective, inverted = False, search = True):
-        self._objective = objective
+    def __init__(self, ray, inverted = False, search = True):
+        self._ray = ray
         self._inverted = inverted
         self._search = search
     
     def __not__(self):
-        return IfNewBlockPos(self._objective, not self._inverted, self._search)
+        return IfNewBlockPos(self._ray, not self._inverted, self._search)
     
     @contextmanager
     def __branch__(self):
@@ -15,12 +18,15 @@ class IfNewBlockPos:
             self._search = False
             execute
                 align xyz 
-                store result score #same_block self._objective
+                store result score #same_block self._ray.objective
                 if entity @s[dx=0]
 
+        with runtime.scope() as cmds:
+            yield True
+
         if self._inverted:
-            unless score #same_block self._objective matches 0:
-                yield True
+            unless score #same_block self._ray.objective matches 0:
+                self._ray.emit_block("same_block_pos", cmds)
         else:
-            if score #same_block self._objective matches 0:
-                yield True
+            if score #same_block self._ray.objective matches 0:
+                self._ray.emit_block("new_block_pos", cmds)
