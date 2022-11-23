@@ -14,7 +14,7 @@ tests-no-zope = ["cloudpickle", "coverage[toml] (>=5.0.2)", "hypothesis", "mypy 
 
 [[package]]
 name = "beet"
-version = "0.79.2"
+version = "0.80.1"
 description = "The Minecraft pack development kit"
 category = "main"
 optional = false
@@ -379,14 +379,14 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "mecha"
-version = "0.56.0"
+version = "0.59.2"
 description = "A powerful Minecraft command library"
 category = "main"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = ">=3.10,<4.0"
 
 [package.dependencies]
-beet = ">=0.71.0"
+beet = ">=0.79.0"
 tokenstream = ">=1.4.2,<2.0.0"
 
 [[package]]
@@ -847,7 +847,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "ec07fcd990fbe8b99017153e9c3b46d1ac88e5b7a92a0d47739a5d8fc8e713ac"
+content-hash = "3eacd9e48fbe4e94d7a479498b43c67dd63e82ae029927d3ba3895edb3db8476"
 
 [metadata.files]
 attrs = [
@@ -855,8 +855,8 @@ attrs = [
     {file = "attrs-22.1.0.tar.gz", hash = "sha256:29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6"},
 ]
 beet = [
-    {file = "beet-0.79.2-py3-none-any.whl", hash = "sha256:f02e1d14cda88d5c25e84df483aba169a60687e63d1365ff5e0c65a9cfb656da"},
-    {file = "beet-0.79.2.tar.gz", hash = "sha256:ed683d68411b27e639ffd762d5c6a06cd09a040f1e441d6f6f6337b94cec6442"},
+    {file = "beet-0.80.1-py3-none-any.whl", hash = "sha256:499ffc70888afd0a81a41ba432dcbd5a7c08c016b9476b0e587624476fd0e17f"},
+    {file = "beet-0.80.1.tar.gz", hash = "sha256:4ccda72bef9ccfffc34dbefe8ec479852f1ed6e3da459feadaf71d0ddfefb530"},
 ]
 black = [
     {file = "black-22.8.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:ce957f1d6b78a8a231b18e0dd2d94a33d2ba738cd88a7fe64f53f659eea49fdd"},
@@ -1116,8 +1116,8 @@ mdurl = [
     {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
 ]
 mecha = [
-    {file = "mecha-0.56.0-py3-none-any.whl", hash = "sha256:4dc7bf125f77c94e9c8bc02dcea61041aea8a1e3e29e18008ee57fb0e41c9beb"},
-    {file = "mecha-0.56.0.tar.gz", hash = "sha256:4f880d110b6ace17784c0d4f71001dbf4ecc2e08f0e3b73d73aebefa9341ba47"},
+    {file = "mecha-0.59.2-py3-none-any.whl", hash = "sha256:a595c779183fe6260d019ef1904e3dfb99a0ad6a072f55491dfcc522aa3b9f7c"},
+    {file = "mecha-0.59.2.tar.gz", hash = "sha256:ce6e50c7df9cc9acb207a66e1f755c8602532b390296943a0457522a8ff792f0"},
 ]
 more-itertools = [
     {file = "more-itertools-8.14.0.tar.gz", hash = "sha256:c09443cd3d5438b8dafccd867a6bc1cb0894389e90cb53d227456b0b0bccb750"},
