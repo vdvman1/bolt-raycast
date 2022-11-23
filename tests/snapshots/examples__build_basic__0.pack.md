@@ -34,13 +34,12 @@ execute if score #distance bolt_raycast.temp matches ..201 positioned ^ ^ ^0.1 r
 `@function demo:foo/raycast_0/run_ray`
 
 ```mcfunction
-tag @s add bolt_raycast.source
-scoreboard players set #hit bolt_raycast.temp 0
-scoreboard players set #distance bolt_raycast.temp 0
 say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
 function demo:foo/raycast_0/step
-say ray finished
 tag @s remove bolt_raycast.source
+say ray finished
 ```
 
 `@function demo:foo/raycast_1/step`
@@ -54,13 +53,12 @@ execute if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 r
 `@function demo:foo/raycast_1/run_ray`
 
 ```mcfunction
-tag @s add bolt_raycast.source
-scoreboard players set #hit bolt_raycast.temp 0
-scoreboard players set #distance bolt_raycast.temp 0
 say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
 function demo:foo/raycast_1/step
-say ray finished
 tag @s remove bolt_raycast.source
+say ray finished
 ```
 
 `@function demo:foo/raycast_2/move_pos`
@@ -101,14 +99,13 @@ execute if score #distance bolt_raycast.temp matches ..100 run function demo:foo
 `@function demo:foo/raycast_2/run_ray`
 
 ```mcfunction
-tag @s add bolt_raycast.source
-scoreboard players set #hit bolt_raycast.temp 0
-scoreboard players set #distance bolt_raycast.temp 0
 say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
 summon minecraft:marker ~ ~ ~ {Tags: ["bolt_raycast.block_pos"]}
 execute positioned ~-0.001 ~-0.001 ~-0.001 as @e[type=minecraft:marker, tag=bolt_raycast.block_pos, dx=0, limit=1] positioned ~0.001 ~0.001 ~0.001 run function demo:foo/raycast_2/init_ray
-say ray finished
 tag @s remove bolt_raycast.source
+say ray finished
 ```
 
 ### minecraft
