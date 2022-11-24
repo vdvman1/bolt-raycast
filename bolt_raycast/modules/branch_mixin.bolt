@@ -1,0 +1,59 @@
+from contextlib import contextmanager
+from abc import ABC, abstractmethod
+from bolt import Runtime
+from bolt.contrib.defer import Defer
+from bolt_raycast.enums import BranchStatus
+
+runtime = ctx.inject(Runtime)
+defer = ctx.inject(Defer)
+
+class BranchMixin(ABC):
+    def __init__(self, inverted = False, branch_status = BranchStatus.Constructed, **kwargs):
+        super().__init__(**kwargs)
+        self._inverted = inverted
+        self._branch_status = branch_status
+    
+    @property
+    def inverted(self):
+        return self._inverted
+    
+    @abstractmethod
+    def __not__(self):
+        if self._branch_status == BranchStatus.LoneBranch:
+            self._branch_status = BranchStatus.DoubleBranch
+        
+        return { inverted: not self._inverted, branch_status: self._branch_status }
+
+    @abstractmethod
+    def _lone_branch(self, cmds):
+        pass
+    
+    @abstractmethod
+    def _init_double_branch(self):
+        pass
+    
+    @abstractmethod
+    def _double_branch(self, cmds):
+        pass
+
+    @contextmanager
+    def __branch__(self):
+        with runtime.scope() as cmds:
+            yield True
+        
+        if self._branch_status == BranchStatus.Constructed:
+            self._branch_status = BranchStatus.LoneBranch
+
+            @defer
+            def emit_check():
+                if self._branch_status == BranchStatus.LoneBranch:
+                    self._lone_branch(cmds)
+                elif self._branch_status == BranchStatus.DoubleBranch:
+                    self._init_double_branch()
+                    self._double_branch(cmds)
+                else:
+                    raise AssertionError(f"Incorrect branch status: {self._branch_status}, expected {BranchStatus.LoneBranch} or {BranchStatus.DoubleBranch}")
+        elif self._branch_status == BranchStatus.DoubleBranch:
+            self._double_branch(cmds)
+        else:
+            raise AssertionError(f"Incorrect branch status: {self._branch_status}, expected {BranchStatus.Constructed} or {BranchStatus.DoubleBranch}")

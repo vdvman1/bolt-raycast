@@ -107,3 +107,14 @@ with raycast(parent = __name__) as ray:
             else:
                 say no stone yet
     say ray finished
+
+with raycast(parent = __name__) as ray:
+    say start ray
+    for step in ray:
+        say next step
+        if not step.detect_block("minecraft:stone"):
+            say no stone yet
+        else:
+            say hit stone!
+            ray.stop()
+    say ray finished

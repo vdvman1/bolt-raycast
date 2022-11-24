@@ -1,66 +1,36 @@
-from contextlib import contextmanager
-from bolt import Runtime
-from bolt.contrib.defer import Defer
-from bolt_raycast.enums import BranchStatus
+from bolt_raycast:branch_mixin import BranchMixin
 
-runtime = ctx.inject(Runtime)
-defer = ctx.inject(Defer)
-
-class DetectBlock:
-    def __init__(self, ray, id, inverted = False, branch_status = BranchStatus.Constructed):
+class DetectBlock(BranchMixin):
+    def __init__(self, ray, id, **kwargs):
+        super().__init__(**kwargs)
         self._ray = ray
         self._id = id
-        self._inverted = inverted
-        self._branch_status = branch_status
     
     def __not__(self):
-        if self._branch_status == BranchStatus.SingleBranch:
-            self._branch_status = BranchStatus.Else
-        
-        return DetectBlock(self._ray, self._id, not self._inverted, self._branch_status)
+        branch_data = super().__not__()
+        return DetectBlock(self._ray, self._id, **branch_data)
     
-    @contextmanager
-    def __branch__(self):
-        with runtime.scope() as cmds:
-            yield True
-
-        if self._branch_status == BranchStatus.Constructed:
-            self._branch_status = BranchStatus.SingleBranch
-            
-            @defer
-            def emit_check():
-                if self._branch_status == BranchStatus.SingleBranch:
-                    self._check_block(cmds)
-                else:
-                    store result score #has_block self._ray.objective if block ~ ~ ~ self._id
-                    self._check_score(cmds)
-        else:
-            self._check_score(cmds)
-    
-    def _emit_hit(self, cmds):
-        self._ray.emit_block("hit_block", cmds)
-    
-    def _emit_not_hit(self, cmds):
-        self._ray.emit_block("not_hit_block", cmds)
-
-    def _check_score(self, cmds):
-        if self._branch_status != BranchStatus.Else:
-            raise AssertionError(f"Incorrect branch status: {self._branch_status}, expected {BranchStatus.Else}")
-
-        if self._inverted:
-            if score #has_block self._ray.objective matches 0:
-                self._emit_not_hit(cmds)
-        else:
-            unless score #has_block self._ray.objective matches 0:
-                self._emit_hit(cmds)
-    
-    def _check_block(self, cmds):
-        if self._branch_status != BranchStatus.SingleBranch:
-            raise AssertionError(f"Incorrect branch status: {self._branch_status}, expected {BranchStatus.SingleBranch}")
-
-        if self._inverted:
+    def _lone_branch(self, cmds):
+        if self.inverted:
             unless block ~ ~ ~ self._id:
                 self._emit_not_hit(cmds)
         else:
             if block ~ ~ ~ self._id:
                 self._emit_hit(cmds)
+    
+    def _init_double_branch(self):
+        store result score #has_block self._ray.objective if block ~ ~ ~ self._id
+    
+    def _double_branch(self, cmds):
+        if self.inverted:
+            if score #has_block self._ray.objective matches 0:
+                self._emit_not_hit(cmds)
+        else:
+            unless score #has_block self._ray.objective matches 0:
+                self._emit_hit(cmds)
+
+    def _emit_hit(self, cmds):
+        self._ray.emit_block("hit_block", cmds)
+    
+    def _emit_not_hit(self, cmds):
+        self._ray.emit_block("not_hit_block", cmds)

@@ -29,6 +29,7 @@ function demo:foo/raycast_7/run_ray
 function demo:foo/raycast_8/run_ray
 function demo:foo/raycast_9/run_ray
 function demo:foo/raycast_10/run_ray
+function demo:foo/raycast_11/run_ray
 ```
 
 `@function demo:foo/raycast_0/step`
@@ -432,6 +433,36 @@ scoreboard players set #distance bolt_raycast.temp 0
 scoreboard players set #hit bolt_raycast.temp 0
 summon minecraft:marker ~ ~ ~ {Tags: ["bolt_raycast.block_pos"]}
 execute positioned ~-0.001 ~-0.001 ~-0.001 as @e[type=minecraft:marker, tag=bolt_raycast.block_pos, dx=0, limit=1] positioned ~0.001 ~0.001 ~0.001 run function demo:foo/raycast_10/init_ray
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:foo/raycast_11/hit_block`
+
+```mcfunction
+say hit stone!
+scoreboard players set #hit bolt_raycast.temp 1
+```
+
+`@function demo:foo/raycast_11/step`
+
+```mcfunction
+say next step
+execute store result score #has_block bolt_raycast.temp if block ~ ~ ~ minecraft:stone
+execute if score #has_block bolt_raycast.temp matches 0 run say no stone yet
+execute unless score #has_block bolt_raycast.temp matches 0 run function demo:foo/raycast_11/hit_block
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #hit bolt_raycast.temp matches 0 if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:foo/raycast_11/step
+```
+
+`@function demo:foo/raycast_11/run_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+scoreboard players set #hit bolt_raycast.temp 0
+function demo:foo/raycast_11/step
 tag @s remove bolt_raycast.source
 say ray finished
 ```
