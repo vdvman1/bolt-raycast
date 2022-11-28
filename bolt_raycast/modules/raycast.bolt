@@ -31,7 +31,7 @@ class RayStep:
             entity_type_tag id {"values":ids}
             id = "#" + id
 
-        return DetectEntities(self._ray, id)
+        return DetectEntities(self, id)
 
     @property
     def new_block_pos_tag(self):

@@ -12,9 +12,10 @@ comment = ctx.inject(Comment)
 logger = logging.getLogger("bolt_raycast")
 
 class DetectEntities(BranchMixin):
-    def __init__(self, ray, id, loop_status = EntityLoopStatus.NoLoop, **kwargs):
+    def __init__(self, ray_step, id, loop_status = EntityLoopStatus.NoLoop, **kwargs):
         super().__init__(**kwargs)
-        self._ray = ray
+        self._ray_step = ray_step
+        self._ray = ray_step.ray
         self._id = id
         self._loop_status = loop_status
     
@@ -87,7 +88,7 @@ class DetectEntities(BranchMixin):
         return cmd[0]
 
     def _create_opposite(self, **kwargs):
-        return DetectEntities(self._ray, self._id, self._loop_status, **kwargs)
+        return DetectEntities(self._ray_step, self._id, self._loop_status, **kwargs)
     
     def _lone_branch(self, cmds):
         if self._loop_status == EntityLoopStatus.CollectingBody:
@@ -166,13 +167,23 @@ class DetectEntities(BranchMixin):
                 if score check_score self._ray.objective matches 0:
                     check_entity()
 
-        positioned ~off1 ~off1 ~off1:
-            if self._id:
-                as @e[type=self._id,tag=!self._ray.initiator_tag,dx=ds,dy=ds,dz=ds,sort=nearest]:
-                    do_check_score()
-            else:
-                as @e[tag=!self._ray.initiator_tag,dx=ds,dy=ds,dz=ds,sort=nearest]:
-                    do_check_score()
+        @defer
+        def loop():
+            positioned ~off1 ~off1 ~off1:
+                if self._id:
+                    if self._ray_step.new_block_pos_tag:
+                        as @e[type=self._id,tag=!self._ray.initiator_tag,tag=!self._ray_step.new_block_pos_tag,dx=ds,dy=ds,dz=ds,sort=nearest]:
+                            do_check_score()
+                    else:
+                        as @e[type=self._id,tag=!self._ray.initiator_tag,dx=ds,dy=ds,dz=ds,sort=nearest]:
+                            do_check_score()
+                else:
+                    if self._ray_step.new_block_pos_tag:
+                        as @e[tag=!self._ray.initiator_tag,tag=!self._ray_step.new_block_pos_tag,dx=ds,dy=ds,dz=ds,sort=nearest]:
+                            do_check_score()
+                    else:
+                        as @e[tag=!self._ray.initiator_tag,dx=ds,dy=ds,dz=ds,sort=nearest]:
+                            do_check_score()
 
 class DetectedEntity:
     def __init__(self, detector):

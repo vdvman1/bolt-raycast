@@ -73,7 +73,7 @@ execute unless score #has_block bolt_raycast.temp matches 0 run function combo:c
 execute if score #has_block bolt_raycast.temp matches 0 run say Not a stone block
 scoreboard players set #has_entity bolt_raycast.temp 0
 scoreboard players set #break_entity_loop bolt_raycast.temp 0
-execute positioned ~-0.05 ~-0.05 ~-0.05 as @e[type=#skeletons, tag=!bolt_raycast.source, dx=0, dy=0, dz=0, sort=nearest] run function combo:cast/raycast_0/check_hit_entity
+execute positioned ~-0.05 ~-0.05 ~-0.05 as @e[type=#skeletons, tag=!bolt_raycast.source, tag=!bolt_raycast.block_pos, dx=0, dy=0, dz=0, sort=nearest] run function combo:cast/raycast_0/check_hit_entity
 execute unless score #has_entity bolt_raycast.temp matches 0 run say At least one unnamed skeleton was found
 execute if score #has_entity bolt_raycast.temp matches 0 run say No unnamed skeletons found
 scoreboard players add #distance bolt_raycast.temp 1
@@ -97,7 +97,7 @@ execute if score #same_block bolt_raycast.temp matches 0 run function combo:cast
 execute unless score #same_block bolt_raycast.temp matches 0 run say Same block position as the previous step
 scoreboard players set #has_entity bolt_raycast.temp 0
 scoreboard players set #break_entity_loop bolt_raycast.temp 0
-execute positioned ~-0.05 ~-0.05 ~-0.05 as @e[type=#skeletons, tag=!bolt_raycast.source, dx=0, dy=0, dz=0, sort=nearest] run function combo:cast/raycast_0/check_hit_entity
+execute positioned ~-0.05 ~-0.05 ~-0.05 as @e[type=#skeletons, tag=!bolt_raycast.source, tag=!bolt_raycast.block_pos, dx=0, dy=0, dz=0, sort=nearest] run function combo:cast/raycast_0/check_hit_entity
 execute unless score #has_entity bolt_raycast.temp matches 0 run say At least one unnamed skeleton was found
 execute if score #has_entity bolt_raycast.temp matches 0 run say No unnamed skeletons found
 scoreboard players add #distance bolt_raycast.temp 1
