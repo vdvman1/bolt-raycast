@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2022-11-28)
+### Feature
+* Automatically detect caller path ([`69ef26b`](https://github.com/vdvman1/bolt-raycast/commit/69ef26b6c28375dc482c5bbdf766804b99b98043))
+
 ## v0.1.1 (2022-11-28)
 ### Fix
 * Entity raycasts including the new block pos helper ([`83411cc`](https://github.com/vdvman1/bolt-raycast/commit/83411cc5a079660323891c91783919dd362d4477))
