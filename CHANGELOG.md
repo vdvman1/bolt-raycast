@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.1 (2022-11-28)
+### Fix
+* Entity raycasts including the new block pos helper ([`83411cc`](https://github.com/vdvman1/bolt-raycast/commit/83411cc5a079660323891c91783919dd362d4477))
+
 ## v0.1.0 (2022-11-28)
 ### Feature
 * Support entity detection ([`02e3513`](https://github.com/vdvman1/bolt-raycast/commit/02e3513afe438f41bda06b099441eae253fcba11))
