@@ -189,12 +189,12 @@ def create_objective(objective):
 
 @contextmanager
 def raycast(*,
-    blocks = None,                   # : int | None
-    steps = None,                    # : int | None
-    parent = None,                   # : str | None
-    tag = "bolt_raycast.source",     # : str | None
-    objective = "bolt_raycast.temp", # : str
-    step_size = 0.1,                 # : float
+    blocks = None,                          # : int | None
+    steps = None,                           # : int | None
+    parent = runtime.modules.current_path,  # : str | None
+    tag = "bolt_raycast.source",            # : str | None
+    objective = "bolt_raycast.temp",        # : str
+    step_size = 0.1,                        # : float
     ):
     create_objective(objective)
 

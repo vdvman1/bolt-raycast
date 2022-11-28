@@ -1,19 +1,19 @@
 from bolt_raycast:raycast import raycast
 
-with raycast(blocks=20.1, parent = __name__) as ray:
+with raycast(blocks=20.1) as ray:
     say start ray
     for step in ray:
         say next step
     say ray finished
 
-with raycast(blocks = 10, parent = __name__) as ray:
+with raycast(blocks = 10) as ray:
     say start ray
     for step in ray:
         say next step
     say ray finished
 
 as @a at @s anchored eyes positioned ^ ^ ^:
-    with raycast(parent = __name__) as ray:
+    with raycast() as ray:
         say start ray
         for step in ray:
             say next step
@@ -23,7 +23,7 @@ as @a at @s anchored eyes positioned ^ ^ ^:
                 say oh, same block pos
         say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -34,7 +34,7 @@ with raycast(parent = __name__) as ray:
             say oh, same block pos
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -46,7 +46,7 @@ with raycast(parent = __name__) as ray:
             say guess this is the same block pos
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -54,7 +54,7 @@ with raycast(parent = __name__) as ray:
             say hit stone!
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -63,7 +63,7 @@ with raycast(parent = __name__) as ray:
             ray.stop()
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -73,7 +73,7 @@ with raycast(parent = __name__) as ray:
             say no stone yet
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -84,7 +84,7 @@ with raycast(parent = __name__) as ray:
             say no stone yet
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -96,7 +96,7 @@ with raycast(parent = __name__) as ray:
             say no stone yet
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -108,7 +108,7 @@ with raycast(parent = __name__) as ray:
                 say no stone yet
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step

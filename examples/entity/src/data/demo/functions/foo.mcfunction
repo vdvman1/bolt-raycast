@@ -1,6 +1,6 @@
 from bolt_raycast:raycast import raycast
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -8,7 +8,7 @@ with raycast(parent = __name__) as ray:
             say hit an entity!
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -18,7 +18,7 @@ with raycast(parent = __name__) as ray:
             say no entity here
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -26,7 +26,7 @@ with raycast(parent = __name__) as ray:
             say I just got hit by the ray!
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -38,7 +38,7 @@ with raycast(parent = __name__) as ray:
             say hit an entity!
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -52,7 +52,7 @@ with raycast(parent = __name__) as ray:
             say no entity here
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -66,7 +66,7 @@ with raycast(parent = __name__) as ray:
             say hit an entity!
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -80,7 +80,7 @@ with raycast(parent = __name__) as ray:
             say hit any non-block entities!
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -90,7 +90,7 @@ with raycast(parent = __name__) as ray:
             entity.include_only_and_stop()
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -103,7 +103,7 @@ with raycast(parent = __name__) as ray:
             say hit an entity!
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -114,7 +114,7 @@ with raycast(parent = __name__) as ray:
 
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -127,7 +127,7 @@ with raycast(parent = __name__) as ray:
             say hit an entity!
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -137,7 +137,7 @@ with raycast(parent = __name__) as ray:
             entity.stop()
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step
@@ -149,7 +149,7 @@ with raycast(parent = __name__) as ray:
 
     say ray finished
 
-with raycast(parent = __name__) as ray:
+with raycast() as ray:
     say start ray
     for step in ray:
         say next step

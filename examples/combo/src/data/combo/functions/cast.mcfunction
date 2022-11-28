@@ -1,8 +1,6 @@
 from bolt_raycast:raycast import raycast
 
-from bolt_raycast:raycast import raycast
-
-with raycast(blocks=10, parent=__name__) as ray:
+with raycast(blocks=10) as ray:
   say Starting the ray
   for step in ray:
     say Next step
