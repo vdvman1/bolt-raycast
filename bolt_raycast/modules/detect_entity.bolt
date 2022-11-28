@@ -1,0 +1,212 @@
+from contextlib import contextmanager
+from bolt import Runtime
+from bolt.contrib.defer import Defer
+from bolt_raycast.enums import BranchStatus, EntityLoopStatus, EntityLoopBreakStatus
+from bolt_raycast:branch_mixin import BranchMixin
+from bolt_raycast.comment import Comment
+import logging
+
+runtime = ctx.inject(Runtime)
+defer = ctx.inject(Defer)
+comment = ctx.inject(Comment)
+logger = logging.getLogger("bolt_raycast")
+
+class DetectEntities(BranchMixin):
+    def __init__(self, ray, id, loop_status = EntityLoopStatus.NoLoop, **kwargs):
+        super().__init__(**kwargs)
+        self._ray = ray
+        self._id = id
+        self._loop_status = loop_status
+    
+    def __iter__(self):
+        if self._loop_status == EntityLoopStatus.CollectingBody:
+            raise Exception("Cannot nest entity loops")
+        elif self._loop_status == EntityLoopStatus.Deferred:
+            raise Exception("The same instance of DetectEntities cannot be used multiple times. Call RayStep.detect_entities to get a new instance instead")
+        elif self._loop_status != EntityLoopStatus.NoLoop:
+            raise AssertionError(f"Incorrect loop status: {self._loop_status}, expected {EntityLoopStatus.NoLoop}")
+        
+        if self.branch_status != BranchStatus.Constructed:
+            raise Exception("Iterating over entities cannot be done after checking for any matching entities")
+        elif self.inverted:
+            raise Exception("Cannot iterate over an inverted entity check")
+        
+        self._loop_status = EntityLoopStatus.CollectingBody
+        entity = DetectedEntity(self)
+        with runtime.scope() as cmds:
+            yield entity
+        self._loop_status = EntityLoopStatus.Deferred
+        
+        @defer
+        def emit_loop():
+            emit_set_has_entity = entity._break_status == EntityLoopBreakStatus.All and self.branch_status != BranchStatus.Constructed
+
+            if entity._stop_early:
+                has_unconditional_stop = False
+                for cmd in reversed(cmds):
+                    if cmd in entity._stop_callbacks:
+                        has_unconditional_stop = True
+                        break
+                
+                if has_unconditional_stop:
+                    entity._stop_using_break = False
+                    check_score = "#hit_entity"
+                    emit_set_has_entity = False
+                else:
+                    check_score = "#break_entity_loop"
+                    if self.branch_status != BranchStatus.Constructed:
+                        self._set_has_entity(0)
+            elif entity._break_status == EntityLoopBreakStatus.Single:
+                check_score = "#hit_entity"
+            else:
+                check_score = None
+
+                if self.branch_status == BranchStatus.Constructed:
+                    if entity._break_status == EntityLoopBreakStatus.Some:
+                        if self._set_has_entity_cmd(1) in cmds:
+                            logger.info("Including all entities is the default behaviour, unconditionally calling entity.include() is unnecessary")
+                        else:
+                            logger.warning("Calling entity.include() without checking if any entities matched results in unnecessary commands. It is recommended to remove this call")
+                else:
+                    if entity._break_status == EntityLoopBreakStatus.Some and self._set_has_entity_cmd(1) in cmds:
+                        logger.info("Including all entities is the default behaviour, unconditionally calling entity.include() is unnecessary")
+
+                    self._set_has_entity(0)
+
+            with self._entity_loop(check_score):
+                runtime.commands.extend(cmds)
+                if emit_set_has_entity:
+                    self._set_has_entity(1)
+    
+    def _set_has_entity(self, value):
+        scoreboard players set #has_entity self._ray.objective value
+    
+    def _set_has_entity_cmd(self, value):
+        with runtime.scope() as cmd:
+            self._set_has_entity(value)
+        return cmd[0]
+
+    def _create_opposite(self, **kwargs):
+        return DetectEntities(self._ray, self._id, self._loop_status, **kwargs)
+    
+    def _lone_branch(self, cmds):
+        if self._loop_status == EntityLoopStatus.CollectingBody:
+            raise Exception("Cannot nest the check for any matching entities inside an explicit entity loop")
+        elif self._loop_status == EntityLoopStatus.Deferred:
+            self._emit_body(cmds)
+        elif self._loop_status == EntityLoopStatus.NoLoop:
+            self._emit_basic_loop()
+            self._emit_body(cmds)
+        else:
+            raise AssertionError(f"Incorrect loop status: {self._loop_status}, expected {EntityLoopStatus.Deferred} or {EntityLoopStatus.NoLoop}")
+
+    def _emit_basic_loop(self):
+        with self._entity_loop("#has_entity"):
+            self._set_has_entity(1)
+
+    def _emit_body(self, cmds):
+        if self.inverted:
+            if score #has_entity self._ray.objective matches 0:
+                self._ray.emit_block("no_entity", cmds)
+        else:
+            unless score #has_entity self._ray.objective matches 0:
+                self._ray.emit_block("hit_any_entity", cmds)
+    
+    def _init_double_branch(self):
+        if self._loop_status == EntityLoopStatus.CollectingBody:
+            raise Exception("Cannot nest the check for any matching entities inside an explicit entity loop")
+        elif self._loop_status == EntityLoopStatus.Deferred:
+            return
+        elif self._loop_status == EntityLoopStatus.NoLoop:
+            self._emit_basic_loop()
+        else:
+            raise AssertionError(f"Incorrect loop status: {self._loop_status}, expected {EntityLoopStatus.Deferred} or {EntityLoopStatus.NoLoop}")
+    
+    def _double_branch(self, cmds):
+        self._emit_body(cmds)
+    
+    @contextmanager
+    def _entity_loop(self, check_score):
+        if check_score:
+            scoreboard players set check_score self._ray.objective 0
+
+        off1 = -self._ray.step_size / 2
+        if self._ray.step_size <= 1:
+            off2 = self._ray.step_size - 1
+            ds = 0
+        else:
+            off2 = None
+            ds = self._ray.step_size - 1
+        
+        with runtime.scope() as cmds:
+            yield
+
+        def check_entity():
+            if off2 is None:
+                positioned ~-off1 ~-off1 ~-off1:
+                    self._ray.emit_block("hit_entity", cmds)
+            else:
+                off3 = round(-off1 - off2, 15)
+                execute
+                    positioned ~off2 ~off2 ~off2
+                    if entity @s[dx=0]
+                    positioned ~off3 ~off3 ~off3:
+                        self._ray.emit_block("hit_entity", cmds)
+
+        def do_check_score():
+            if not check_score:
+                check_entity()
+                return
+            
+            execute function self._ray.sub_path("check_hit_entity"):
+                comment(
+                    "This function is needed to ensure the score is checked after the previous entity is processed.\n\n" +
+                    "Without this function, the game checks the score for all entities at once, before moving on to the rest of the command"
+                )
+                if score check_score self._ray.objective matches 0:
+                    check_entity()
+
+        positioned ~off1 ~off1 ~off1:
+            if self._id:
+                as @e[type=self._id,tag=!self._ray.initiator_tag,dx=ds,dy=ds,dz=ds,sort=nearest]:
+                    do_check_score()
+            else:
+                as @e[tag=!self._ray.initiator_tag,dx=ds,dy=ds,dz=ds,sort=nearest]:
+                    do_check_score()
+
+class DetectedEntity:
+    def __init__(self, detector):
+        self._break_status = EntityLoopBreakStatus.All
+        self._stop_early = False
+        self._detector = detector
+        self._objective = detector._ray.objective
+        self._stop_using_break = True
+        self._stop_callbacks = []
+
+    def include(self):
+        if self._break_status == EntityLoopBreakStatus.Single:
+            raise Exception("Cannot use both include and include_only_and_stop")
+        
+        self._break_status = EntityLoopBreakStatus.Some
+        self._detector._set_has_entity(1)
+    
+    def include_only_and_stop(self):
+        if self._break_status == EntityLoopBreakStatus.Some:
+            raise Exception("Cannot use both include and include_only_and_stop")
+        
+        self._break_status = EntityLoopBreakStatus.Single
+        self._detector._set_has_entity(1)
+        @defer
+        def maybe_emit_stop():
+            if self._stop_early:
+                scoreboard players set #break_entity_loop self._objective 1
+    
+    def stop(self):
+        self._stop_early = True
+        @defer
+        def emit_stop():
+            if self._stop_using_break:
+                scoreboard players set #break_entity_loop self._objective 1
+            else:
+                scoreboard players set #has_entity self._objective 1
+        self._stop_callbacks.append(runtime.commands[-1])

@@ -4,6 +4,7 @@ from bolt import Runtime
 from bolt.contrib.defer import Defer
 from bolt_raycast:if_new_block_pos import IfNewBlockPos
 from bolt_raycast:detect_block import DetectBlock
+from bolt_raycast:detect_entity import DetectEntities
 
 runtime = ctx.inject(Runtime)
 defer = ctx.inject(Defer)
@@ -17,6 +18,20 @@ class RayStep:
     @property
     def ray(self):
         return self._ray
+
+    def detect_entities(
+        self,
+        # TODO: support arbitrary selector arguments
+        id = None, # : str | list[str] | None # Single entity type, single entity_type tag, list of entity types / entity_type tags, or use None to indicate all entity types
+        ):
+
+        if isinstance(id, list):
+            ids = id
+            id = f"{self._parent}/entities"
+            entity_type_tag id {"values":ids}
+            id = "#" + id
+
+        return DetectEntities(self._ray, id)
 
     @property
     def new_block_pos_tag(self):
