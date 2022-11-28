@@ -6,9 +6,8 @@ class DetectBlock(BranchMixin):
         self._ray = ray
         self._id = id
     
-    def __not__(self):
-        branch_data = super().__not__()
-        return DetectBlock(self._ray, self._id, **branch_data)
+    def _create_opposite(self, **kwargs):
+        return DetectBlock(self._ray, self._id, **kwargs)
     
     def _lone_branch(self, cmds):
         if self.inverted:
