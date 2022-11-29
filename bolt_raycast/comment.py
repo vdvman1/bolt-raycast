@@ -54,5 +54,5 @@ class Comment:
         self._runtime = ctx.inject(Runtime)
         ctx.inject(Mecha).serialize.extend(serialise_comment)
 
-    def __call__(self, comment: str):
+    def __call__(self, comment: str = ""):
         self._runtime.commands.append(AstExplicitComment(comment=comment))
