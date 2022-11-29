@@ -55,6 +55,40 @@ function demo:foo/raycast_10/run_ray
 # Inverted checking for stone along the ray, stopping on the first
 # stone
 function demo:foo/raycast_11/run_ray
+
+# Inline raycast in the current function instead of creating a new
+# function
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+function demo:foo/raycast_12/step
+tag @s remove bolt_raycast.source
+say ray finished
+
+# Explicitly specify the name of the ray function. Don't generate
+# raycast_{incr} folders
+function demo:named_ray
+
+# Explicitly specify the name of the ray function, but inline it in
+# the current function
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+function demo:inline_named_ray/step
+tag @s remove bolt_raycast.source
+say ray finished
+
+# Explicitly specify the parent for all functions generated
+function demo:explicit_parent/raycast_0/run_ray
+
+# Explicitly specify the parent for all functions generated, and
+# inline the ray function
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+function demo:inline_explicit_parent/raycast_0/step
+tag @s remove bolt_raycast.source
+say ray finished
 ```
 
 `@function demo:foo/raycast_0/step`
@@ -490,6 +524,68 @@ scoreboard players set #hit bolt_raycast.temp 0
 function demo:foo/raycast_11/step
 tag @s remove bolt_raycast.source
 say ray finished
+```
+
+`@function demo:foo/raycast_12/step`
+
+```mcfunction
+say next step
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:foo/raycast_12/step
+```
+
+`@function demo:named_ray/step`
+
+```mcfunction
+say next step
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:named_ray/step
+```
+
+`@function demo:named_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+function demo:named_ray/step
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:inline_named_ray/step`
+
+```mcfunction
+say next step
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:inline_named_ray/step
+```
+
+`@function demo:explicit_parent/raycast_0/step`
+
+```mcfunction
+say next step
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:explicit_parent/raycast_0/step
+```
+
+`@function demo:explicit_parent/raycast_0/run_ray`
+
+```mcfunction
+say start ray
+tag @s add bolt_raycast.source
+scoreboard players set #distance bolt_raycast.temp 0
+function demo:explicit_parent/raycast_0/step
+tag @s remove bolt_raycast.source
+say ray finished
+```
+
+`@function demo:inline_explicit_parent/raycast_0/step`
+
+```mcfunction
+say next step
+scoreboard players add #distance bolt_raycast.temp 1
+execute if score #distance bolt_raycast.temp matches ..100 positioned ^ ^ ^0.1 run function demo:inline_explicit_parent/raycast_0/step
 ```
 
 ### minecraft

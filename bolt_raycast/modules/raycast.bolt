@@ -5,9 +5,12 @@ from bolt.contrib.defer import Defer
 from bolt_raycast:if_new_block_pos import IfNewBlockPos
 from bolt_raycast:detect_block import DetectBlock
 from bolt_raycast:detect_entity import DetectEntities
+from tokenstream import TokenStream
+from mecha import Mecha, delegate
 
 runtime = ctx.inject(Runtime)
 defer = ctx.inject(Defer)
+mc = ctx.inject(Mecha)
 
 class RayStep:
     def __init__(self, ray, first, new_block_pos_tag):
@@ -192,6 +195,8 @@ def raycast(*,
     blocks = None,                          # : int | None
     steps = None,                           # : int | None
     parent = runtime.modules.current_path,  # : str | None
+    function = None,                        # : str | None
+    emit_root_func = True,                  # : bool
     tag = "bolt_raycast.source",            # : str | None
     objective = "bolt_raycast.temp",        # : str
     step_size = 0.1,                        # : float
@@ -209,16 +214,29 @@ def raycast(*,
         else:
             raise ValueError("Cannot specify both a block distance and a step count")
 
-    name_spec = "raycast_{incr}"
-    if parent:
-        if not parent.endswith("/"):
-            parent = parent + "/"
-            
-        with ctx.override(generate_path = parent) as no_prefix:
-            parent = no_prefix.generate.path(name_spec)
-    else:
-        parent = generate_path(name_spec)
+    if function:
+        stream = TokenStream(function)
+        with mc.prepare_token_stream(stream), stream.provide(disable_interpolation=True):
+            delegate("resource_location", stream)
+            stream.expect_eof()
+        run_func = function
+        parent = run_func
+        ray = Ray(parent, tag, objective, step_size, steps)
+    else:   
+        name_spec = "raycast_{incr}"
+        if parent:
+            if not parent.endswith("/"):
+                parent = parent + "/"
+                
+            with ctx.override(generate_path = parent) as no_prefix:
+                parent = no_prefix.generate.path(name_spec)
+        else:
+            parent = generate_path(name_spec)
+        ray = Ray(parent, tag, objective, step_size, steps)
+        run_func = ray.sub_path("run_ray")
     
-    ray = Ray(parent, tag, objective, step_size, steps)
-    execute function ray.sub_path("run_ray"):
+    if emit_root_func:
+        execute function run_func:
+            yield ray
+    else:
         yield ray

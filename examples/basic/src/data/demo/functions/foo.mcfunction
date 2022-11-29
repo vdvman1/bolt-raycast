@@ -144,3 +144,43 @@ with raycast() as ray:
             say hit stone!
             ray.stop()
     say ray finished
+
+comment()
+comment("Inline raycast in the current function instead of creating a new function")
+with raycast(emit_root_func=False) as ray:
+    say start ray
+    for step in ray:
+        say next step
+    say ray finished
+
+comment()
+comment("Explicitly specify the name of the ray function. Don't generate raycast_{incr} folders")
+with raycast(function=./named_ray) as ray:
+    say start ray
+    for step in ray:
+        say next step
+    say ray finished
+
+comment()
+comment("Explicitly specify the name of the ray function, but inline it in the current function")
+with raycast(function=./inline_named_ray,emit_root_func=False) as ray:
+    say start ray
+    for step in ray:
+        say next step
+    say ray finished
+
+comment()
+comment("Explicitly specify the parent for all functions generated")
+with raycast(parent=./explicit_parent) as ray:
+    say start ray
+    for step in ray:
+        say next step
+    say ray finished
+
+comment()
+comment("Explicitly specify the parent for all functions generated, and inline the ray function")
+with raycast(parent=./inline_explicit_parent,emit_root_func=False) as ray:
+    say start ray
+    for step in ray:
+        say next step
+    say ray finished
