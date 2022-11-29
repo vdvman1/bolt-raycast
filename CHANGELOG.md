@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.0 (2022-11-29)
+### Feature
+* Add options to configure the name of the ray function and to inline it ([`395a296`](https://github.com/vdvman1/bolt-raycast/commit/395a296d69b5b928e440049c3d6ce21a8ef0a8cf))
+* Default to an empty line in comments ([`d9414a6`](https://github.com/vdvman1/bolt-raycast/commit/d9414a644da57f3fb03a11834d068dc519601a75))
+
+### Documentation
+* Add comments for example functions that contain multiple examples ([`7ea898f`](https://github.com/vdvman1/bolt-raycast/commit/7ea898f209d526530785f48649189b8668eb169b))
+
 ## v0.2.0 (2022-11-28)
 ### Feature
 * Automatically detect caller path ([`69ef26b`](https://github.com/vdvman1/bolt-raycast/commit/69ef26b6c28375dc482c5bbdf766804b99b98043))
