@@ -1,17 +1,25 @@
 from bolt_raycast:raycast import raycast
+from bolt_raycast.comment import Comment
 
+comment = ctx.inject(Comment)
+
+comment("20.1 blocks")
 with raycast(blocks=20.1) as ray:
     say start ray
     for step in ray:
         say next step
     say ray finished
 
+comment()
+comment("10 blocks")
 with raycast(blocks = 10) as ray:
     say start ray
     for step in ray:
         say next step
     say ray finished
 
+comment()
+comment("Check if new block pos, starting from player's eyes")
 as @a at @s anchored eyes positioned ^ ^ ^:
     with raycast() as ray:
         say start ray
@@ -23,6 +31,8 @@ as @a at @s anchored eyes positioned ^ ^ ^:
                 say oh, same block pos
         say ray finished
 
+comment()
+comment("Stop on first new block pos")
 with raycast() as ray:
     say start ray
     for step in ray:
@@ -34,6 +44,8 @@ with raycast() as ray:
             say oh, same block pos
     say ray finished
 
+comment()
+comment("Stop on first new block pos, with more commands in the else case")
 with raycast() as ray:
     say start ray
     for step in ray:
@@ -46,6 +58,8 @@ with raycast() as ray:
             say guess this is the same block pos
     say ray finished
 
+comment()
+comment("Check for all stone along the ray")
 with raycast() as ray:
     say start ray
     for step in ray:
@@ -54,6 +68,8 @@ with raycast() as ray:
             say hit stone!
     say ray finished
 
+comment()
+comment("Stop on first stone block")
 with raycast() as ray:
     say start ray
     for step in ray:
@@ -63,6 +79,8 @@ with raycast() as ray:
             ray.stop()
     say ray finished
 
+comment()
+comment("Check for all stone along the ray, with an else case")
 with raycast() as ray:
     say start ray
     for step in ray:
@@ -73,6 +91,8 @@ with raycast() as ray:
             say no stone yet
     say ray finished
 
+comment()
+comment("Stop on first stone block, with an else case")
 with raycast() as ray:
     say start ray
     for step in ray:
@@ -84,6 +104,8 @@ with raycast() as ray:
             say no stone yet
     say ray finished
 
+comment()
+comment("Stop on first stone block, with an else case with more commands")
 with raycast() as ray:
     say start ray
     for step in ray:
@@ -96,6 +118,8 @@ with raycast() as ray:
             say no stone yet
     say ray finished
 
+comment()
+comment("Check for stone only for new block positions, and stop on the first stone")
 with raycast() as ray:
     say start ray
     for step in ray:
@@ -108,6 +132,8 @@ with raycast() as ray:
                 say no stone yet
     say ray finished
 
+comment()
+comment("Inverted checking for stone along the ray, stopping on the first stone")
 with raycast() as ray:
     say start ray
     for step in ray:

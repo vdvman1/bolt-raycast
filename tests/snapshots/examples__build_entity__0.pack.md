@@ -18,19 +18,54 @@
 `@function demo:foo`
 
 ```mcfunction
+# Detect if there are any entities at each step
 function demo:foo/raycast_0/run_ray
+
+# Detect if there are any entities at each step, with an else case
 function demo:foo/raycast_1/run_ray
+
+# Do something for each entity at each step along the ray
 function demo:foo/raycast_2/run_ray
+
+# Do something for each entity, and check if there were any entities,
+# at each step along the ray
 function demo:foo/raycast_3/run_ray
+
+# Do something for each entity, and check if there were any entities
+# with an else case, at each step along the ray
 function demo:foo/raycast_4/run_ray
+
+# Do something for each entity, and do an inverted check if there were
+# any entities with an else case, at each step along the ray
 function demo:foo/raycast_5/run_ray
+
+# Only include non-`smithed.block` entities
 function demo:foo/raycast_6/run_ray
+
+# Include only the first entity at each step along the ray
 function demo:foo/raycast_7/run_ray
+
+# Include only the first entity at each step along the ray, and check
+# if was one
 function demo:foo/raycast_8/run_ray
+
+# Explicitly include all detected entities
 function demo:foo/raycast_9/run_ray
+
+# Explicitly include all detected entities, and check if there were
+# any
 function demo:foo/raycast_10/run_ray
+
+# Stop the detection of entities at each step on the first entity
+# found
 function demo:foo/raycast_11/run_ray
+
+# Stop the detection of entities once a `smithed.block` entity was
+# found at each step
 function demo:foo/raycast_12/run_ray
+
+# Stop the detection of entities once a `smithed.block` entity was
+# found at each step, and check if there were any entities before then
 function demo:foo/raycast_13/run_ray
 ```
 

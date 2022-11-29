@@ -18,17 +18,42 @@
 `@function demo:foo`
 
 ```mcfunction
+# 20.1 blocks
 function demo:foo/raycast_0/run_ray
+
+# 10 blocks
 function demo:foo/raycast_1/run_ray
+
+# Check if new block pos, starting from player's eyes
 execute as @a at @s anchored eyes positioned ^ ^ ^ run function demo:foo/raycast_2/run_ray
+
+# Stop on first new block pos
 function demo:foo/raycast_3/run_ray
+
+# Stop on first new block pos, with more commands in the else case
 function demo:foo/raycast_4/run_ray
+
+# Check for all stone along the ray
 function demo:foo/raycast_5/run_ray
+
+# Stop on first stone block
 function demo:foo/raycast_6/run_ray
+
+# Check for all stone along the ray, with an else case
 function demo:foo/raycast_7/run_ray
+
+# Stop on first stone block, with an else case
 function demo:foo/raycast_8/run_ray
+
+# Stop on first stone block, with an else case with more commands
 function demo:foo/raycast_9/run_ray
+
+# Check for stone only for new block positions, and stop on the first
+# stone
 function demo:foo/raycast_10/run_ray
+
+# Inverted checking for stone along the ray, stopping on the first
+# stone
 function demo:foo/raycast_11/run_ray
 ```
 
