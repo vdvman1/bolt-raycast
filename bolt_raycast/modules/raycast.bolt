@@ -1,12 +1,12 @@
 from contextlib import contextmanager
 from math import ceil
+from mecha import Mecha
 from bolt import Runtime
 from bolt.contrib.defer import Defer
 from bolt_raycast:if_new_block_pos import IfNewBlockPos
 from bolt_raycast:detect_block import DetectBlock
 from bolt_raycast:detect_entity import DetectEntities
-from tokenstream import TokenStream
-from mecha import Mecha, delegate
+from bolt_raycast.parse import parse_node
 
 runtime = ctx.inject(Runtime)
 defer = ctx.inject(Defer)
@@ -215,10 +215,7 @@ def raycast(*,
             raise ValueError("Cannot specify both a block distance and a step count")
 
     if function:
-        stream = TokenStream(function)
-        with mc.prepare_token_stream(stream), stream.provide(disable_interpolation=True):
-            delegate("resource_location", stream)
-            stream.expect_eof()
+        parse_node(mc, function, "resource_location")
         run_func = function
         parent = run_func
         ray = Ray(parent, tag, objective, step_size, steps)
