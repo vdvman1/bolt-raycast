@@ -1,0 +1,8 @@
+require:
+  - bolt
+  - bolt_raycast
+data_pack:
+  load: "src"
+pipeline:
+  - mecha
+output: "dist"

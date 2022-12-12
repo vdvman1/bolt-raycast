@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import logging
 from math import ceil
 from mecha import Mecha
 from bolt import Runtime
@@ -7,10 +8,12 @@ from bolt_raycast:if_new_block_pos import IfNewBlockPos
 from bolt_raycast:detect_block import DetectBlock
 from bolt_raycast:detect_entity import DetectEntities
 from bolt_raycast.parse import parse_node
+from bolt_raycast.utils import to_snbt, nested_and_predicate
 
 runtime = ctx.inject(Runtime)
 defer = ctx.inject(Defer)
 mc = ctx.inject(Mecha)
+logger = logging.getLogger("bolt_raycast")
 
 class RayStep:
     def __init__(self, ray, first, new_block_pos_tag):
@@ -56,19 +59,135 @@ class RayStep:
     # check if the current block matches
     def detect_block(
         self,
-        # TODO: support arbitrary block predicate
-        id, # : str | list[str] # Single block ID, single block tag, or list of block IDs / block tags
+        *args # : str # Any number of block predicates
         ):
 
-        if isinstance(id, list):
-            ids = id
-            id = f"{self._parent}/blocks"
-            block_tag id {
-                "values": ids
-            }
-            id = "#" + id
+        using_predicate = False
 
-        return DetectBlock(self._ray, id)
+        if len(args) > 1:
+            simple_ids = set()
+            preds = dict()
+
+            for pred in args:
+                pred = parse_node(mc, pred, "block_predicate")
+                id = pred.identifier.get_value()
+
+                def warn_simple_and_complex():
+                    logger.warning(f"Block ID {id} is used both with and without states/NBT, the states/NBT will never be checked")
+
+                if len(pred.block_states) == 0 and pred.data_tags is None:
+                    simple_ids.add(id)
+                    if preds.pop(id, None) is not None:
+                        warn_simple_and_complex()
+                elif id in simple_ids:
+                    warn_simple_and_complex()
+                else:
+                    preds.setdefault(id, []).append(pred)
+
+            simple_len = len(simple_ids)
+
+            pred_len = len(preds)
+            if pred_len == 0:
+                if simple_len == 1:
+                    match = simple_ids.pop()
+                else:
+                    match = self._ray.sub_path("blocks")
+                    block_tag match {
+                        "values": list(simple_ids)
+                    }
+                    match = "#" + match
+            else:
+                root_alts = []
+
+                if simple_len > 0:
+                    root_alts.append({
+                        "condition": "minecraft:location_check",
+                        "predicate": {
+                            "block": {
+                                "blocks": list(simple_ids)
+                            }
+                        }
+                    })
+                
+                for id, sub_preds in preds.items():
+                    def get_states(block_states):
+                        states = {}
+                        for state, val in sub_pred.block_states:
+                            states[state.value] = val.value
+                        
+                        return states
+
+                    if len(sub_preds) == 1:
+                        sub_pred = sub_preds[0]
+                        location = {}
+
+                        if sub_pred.block_states:
+                            location["state"] = get_states(sub_pred.block_states)
+                        
+                        if sub_pred.data_tags:
+                            location["nbt"] = to_snbt(sub_pred.data_tags)
+                        
+                        root_alts.append({
+                            "condition": "minecraft:location_check",
+                            "predicate": {
+                                "block": {
+                                    "blocks": [id],
+                                    **location
+                                }
+                            }
+                        })
+                    else:
+                        state_only = []
+                        includes_nbt = []
+
+                        for sub_pred in sub_preds:
+                            location = {}
+
+                            def get_check():
+                                return {
+                                    "condition": "minecraft:location_check",
+                                    "predicate": {
+                                        "block": {
+                                            **location
+                                        }
+                                    }
+                                }
+
+                            if sub_pred.block_states:
+                                location["state"] = get_states(sub_pred.block_states)
+                            
+                            if sub_pred.data_tags:
+                                location["nbt"] = to_snbt(sub_pred.data_tags)
+                                includes_nbt.append(get_check())
+                            else:
+                                state_only.append(get_check())
+                        
+                        root_alts.append(nested_and_predicate(
+                            {
+                                "condition": "minecraft:location_check",
+                                "predicate": {
+                                    "block": {
+                                        "blocks": [id],
+                                    }
+                                }
+                            },
+                            {
+                                "condition": "minecraft:alternative",
+                                "terms": [*state_only, *includes_nbt]
+                            }
+                        ))
+                
+                #print(root_alts)
+                match = self._ray.sub_path("blocks")
+                predicate match {
+                    "condition": "minecraft:alternative",
+                    "terms": root_alts
+                }
+                using_predicate = True
+        else:
+            match = args[0]
+        
+        return DetectBlock(self._ray, match, using_predicate)
 
 class Ray:
     _stop_requested = False
