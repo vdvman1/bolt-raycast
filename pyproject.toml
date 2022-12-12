@@ -22,7 +22,7 @@ include = ["bolt_raycast/py.typed"]
 python = "^3.10"
 beet = "^0.80.1"
 mecha = "^0.61.0"
-bolt = "^0.21.0"
+bolt = ">=0.21,<0.23"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1.3"
